@@ -1,39 +1,42 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.param_functions import Depends
 
-from banking_fastapi.db.dao.dummy_dao import DummyDAO
-from banking_fastapi.db.models.dummy_model import DummyModel
-from banking_fastapi.web.api.dummy.schema import DummyModelDTO, DummyModelInputDTO
+from banking_fastapi.db.dao.user_dao import UserDAO
+from banking_fastapi.db.models.user_model import UserModel
+from banking_fastapi.db.schemas.user_schema import UserModelDTO, UserModelInputDTO
 
 router = APIRouter()
 
 
-@router.get("/", response_model=list[DummyModelDTO])
-async def get_dummy_models(
+@router.get("/", response_model=list[UserModelDTO])
+async def get_users(
     limit: int = 10,
     offset: int = 0,
-    dummy_dao: DummyDAO = Depends(),
-) -> list[DummyModel]:
+    user_dao: UserDAO = Depends(),
+) -> list[UserModel]:
     """
     Retrieve all dummy objects from the database.
 
     :param limit: limit of dummy objects, defaults to 10.
     :param offset: offset of dummy objects, defaults to 0.
-    :param dummy_dao: DAO for dummy models.
+    :param user_dao: DAO for dummy models.
     :return: list of dummy objects from database.
     """
-    return await dummy_dao.get_all_dummies(limit=limit, offset=offset)
+    return await user_dao.get_all_users(limit=limit, offset=offset)
 
 
 @router.put("/")
-async def create_dummy_model(
-    new_dummy_object: DummyModelInputDTO,
-    dummy_dao: DummyDAO = Depends(),
+async def create_user(
+    new_user: UserModelInputDTO,
+    user_dao: UserDAO = Depends(),
 ) -> None:
     """
-    Creates dummy model in the database.
+    Creates user in the database.
 
-    :param new_dummy_object: new dummy model item.
-    :param dummy_dao: DAO for dummy models.
+    :param new_user: new user item.
+    :param user_dao: DAO for users.
     """
-    await dummy_dao.create_dummy_model(name=new_dummy_object.name)
+    try:
+        await user_dao.create_user(new_user)
+    except ValueError as err:
+        raise HTTPException(status_code=403, detail=err) from err
