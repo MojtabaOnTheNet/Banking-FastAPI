@@ -1,30 +1,21 @@
-from bson import ObjectId
-from pydantic import BaseModel, ConfigDict, field_validator
+from datetime import UTC, datetime
+
+from beanie import PydanticObjectId
+from pydantic import BaseModel
 
 
 class UserModelDTO(BaseModel):
     """
     DTO for users.
 
-    It returned when accessing users from the API.
+    It's returned when accessing users from the API.
     """
 
-    id: str
+    id: PydanticObjectId
     full_name: str
+    balance: float
     phone: str
-
-    @field_validator("id", mode="before")
-    @classmethod
-    def parse_object_id(cls, document_id: ObjectId) -> str:
-        """
-        Validator that converts `ObjectId` to json serializable `str`.
-
-        :param document_id: Bson Id for this document.
-        :return: The converted str.
-        """
-        return str(document_id)
-
-    model_config = ConfigDict(from_attributes=True)
+    created_at: datetime = datetime.now(UTC)
 
 
 class UserModelInputDTO(BaseModel):

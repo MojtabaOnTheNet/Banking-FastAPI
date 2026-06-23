@@ -15,7 +15,7 @@ def get_app() -> FastAPI:
     """
     configure_logging()
     app = FastAPI(
-        title="banking_fastapi",
+        title="Banking FastAPI",
         lifespan=lifespan_setup,
         docs_url="/api/docs",
         redoc_url="/api/redoc",

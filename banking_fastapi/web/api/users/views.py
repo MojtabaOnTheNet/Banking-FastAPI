@@ -15,17 +15,17 @@ async def get_users(
     user_dao: UserDAO = Depends(),
 ) -> list[UserModel]:
     """
-    Retrieve all dummy objects from the database.
+    Retrieve all user objects from the database.
 
-    :param limit: limit of dummy objects, defaults to 10.
-    :param offset: offset of dummy objects, defaults to 0.
-    :param user_dao: DAO for dummy models.
-    :return: list of dummy objects from database.
+    :param limit: limit of user objects, defaults to 10.
+    :param offset: offset of user objects, defaults to 0.
+    :param user_dao: DAO for user models.
+    :return: list of user objects from database.
     """
     return await user_dao.get_all_users(limit=limit, offset=offset)
 
 
-@router.put("/")
+@router.post("/")
 async def create_user(
     new_user: UserModelInputDTO,
     user_dao: UserDAO = Depends(),

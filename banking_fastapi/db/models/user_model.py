@@ -1,4 +1,5 @@
 import re
+from datetime import UTC, datetime
 from typing import Annotated
 
 from beanie import Document, Indexed
@@ -11,6 +12,8 @@ class UserModel(Document):
     phone: Annotated[str, Indexed(unique=True)]
     full_name: str
     hashed_password: str
+    balance: float = 1000.0
+    created_at: datetime = datetime.now(UTC)
     is_active: bool = True
     is_admin: bool = False
 
