@@ -6,6 +6,9 @@ from banking_fastapi.db.schemas.transaction_schema import (
     TransactionModelDTO,
     TransactionModelInputDTO,
 )
+from banking_fastapi.services.transaction_service import (
+    TransactionService,
+)
 
 router = APIRouter()
 
@@ -24,16 +27,16 @@ async def get_transactions(
     :param transaction_dao: DAO for transaction models.
     :return: list of transaction objects from database.
     """
-    return await transaction_dao.get_all_transactions(limit=limit, offset=offset)
+    return await transaction_dao.get_all(limit=limit, offset=offset)
 
 
-@router.post("/", status_code=200)
+@router.post("/", status_code=201)
 async def create_transaction(
     transaction: TransactionModelInputDTO,
-    transaction_dao: TransactionDAO = Depends(),
+    transaction_service: TransactionService = Depends(),
 ) -> None:
     """Create a new transaction."""
     try:
-        await transaction_dao.create_transaction(transaction)
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=err) from err
+        await transaction_service.create_transaction(transaction)
+    except Exception as error:
+        raise HTTPException(404, str(error)) from error

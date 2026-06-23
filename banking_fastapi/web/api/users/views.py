@@ -22,11 +22,11 @@ async def get_users(
     :param user_dao: DAO for user models.
     :return: list of user objects from database.
     """
-    return await user_dao.get_all_users(limit=limit, offset=offset)
+    return await user_dao.get_all(limit=limit, offset=offset)
 
 
-@router.post("/")
-async def create_user(
+@router.post("/", status_code=201)
+async def insert(
     new_user: UserModelInputDTO,
     user_dao: UserDAO = Depends(),
 ) -> None:
@@ -37,6 +37,6 @@ async def create_user(
     :param user_dao: DAO for users.
     """
     try:
-        await user_dao.create_user(new_user)
+        await user_dao.insert(new_user)
     except ValueError as err:
         raise HTTPException(status_code=403, detail=err) from err

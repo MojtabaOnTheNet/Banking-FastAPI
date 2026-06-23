@@ -1,3 +1,5 @@
+from beanie import PydanticObjectId
+
 from banking_fastapi.db.models.user_model import UserModel
 from banking_fastapi.db.schemas.user_schema import UserModelInputDTO
 from banking_fastapi.security.security import password_hash
@@ -55,7 +57,7 @@ from banking_fastapi.security.security import password_hash
 class UserDAO:
     """Class of accessing user table."""
 
-    async def create_user(self, user: UserModelInputDTO) -> None:
+    async def insert(self, user: UserModelInputDTO) -> None:
         """Add single user to session."""
 
         await UserModel.insert_one(
@@ -66,6 +68,14 @@ class UserDAO:
             )
         )
 
-    async def get_all_users(self, limit: int, offset: int) -> list[UserModel]:
+    async def get_all(self, limit: int, offset: int) -> list[UserModel]:
         """Get all users with limit/offset pagination."""
         return await UserModel.find_all(skip=offset, limit=limit).to_list()
+
+    async def get_by_id(self, user_id: PydanticObjectId) -> UserModel | None:
+        """Get single user."""
+        return await UserModel.get(user_id)
+
+    async def update_balance(self, user: UserModel, transaction_amount: float) -> None:
+        """Update user balance."""
+        await user.update({"$inc": {"balance": transaction_amount}})

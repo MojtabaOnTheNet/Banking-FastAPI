@@ -5,9 +5,8 @@ from banking_fastapi.db.schemas.transaction_schema import TransactionModelInputD
 class TransactionDAO:
     """Class of accessing transaction table."""
 
-    async def create_transaction(self, transaction: TransactionModelInputDTO) -> None:
+    async def insert(self, transaction: TransactionModelInputDTO) -> None:
         """Add single transaction to session."""
-
         await TransactionModel.insert_one(
             TransactionModel(
                 user_id=transaction.user_id,
@@ -16,8 +15,6 @@ class TransactionDAO:
             )
         )
 
-    async def get_all_transactions(
-        self, limit: int, offset: int
-    ) -> list[TransactionModel]:
+    async def get_all(self, limit: int, offset: int) -> list[TransactionModel]:
         """Get all transactions with limit/offset pagination."""
         return await TransactionModel.find_all(skip=offset, limit=limit).to_list()

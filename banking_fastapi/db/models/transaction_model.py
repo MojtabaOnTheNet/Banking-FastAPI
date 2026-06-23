@@ -17,7 +17,7 @@ class TransactionModel(Document):
     """Model for a transaction."""
 
     user_id: PydanticObjectId
-    transaction_type: TransactionType
+    transaction_type: TransactionType  # Add error handling for it later
     amount: float
     created_at: datetime = datetime.now(UTC)
 
