@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from banking_fastapi.db.dao.user_dao import UserDAO
 from banking_fastapi.db.models.auth_model import RefreshModel
 from banking_fastapi.db.schemas.auth_schema import (
+    AccessTokenDTO,
     LoginInputDTO,
     RegisterInputDTO,
     TokenPairDTO,
@@ -49,7 +50,7 @@ class AuthService:
         if not verify_password(data.password, user.hashed_password):
             raise ValueError("Wrong password")
         access_token = create_access_token(
-            user_id=user.id, expires_delta=timedelta(minutes=15)
+            user_id=user.id, expires_delta=timedelta(minutes=5)
         )
         refresh_token = create_refresh_token()
         refresh_session = RefreshModel(
@@ -59,3 +60,10 @@ class AuthService:
         )
         await refresh_session.insert()
         return TokenPairDTO(access_token=access_token, refresh_token=refresh_token)
+
+    async def refresh(self, token_session: RefreshModel) -> AccessTokenDTO:
+        """Create a new access token."""
+        new_access_token = create_access_token(
+            user_id=token_session.user_id, expires_delta=timedelta(minutes=5)
+        )
+        return AccessTokenDTO(access_token=new_access_token)

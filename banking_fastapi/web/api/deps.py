@@ -1,12 +1,14 @@
 import logging
+from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Cookie, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt
 from pydantic import ValidationError
 
 from banking_fastapi.db.dao.user_dao import UserDAO
+from banking_fastapi.db.models.auth_model import RefreshModel
 from banking_fastapi.db.schemas.user_schema import UserModelDTO
 from banking_fastapi.security import security
 from banking_fastapi.settings import settings
@@ -44,3 +46,31 @@ async def get_current_user(
 
 
 CurrentUser = Annotated[UserModelDTO, Depends(get_current_user)]
+
+
+async def get_refresh_session(refresh_token: str | None = Cookie(None)) -> RefreshModel:
+    """Validate and return refresh token(session)."""
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="Missing refresh token")
+
+    # Hash and validate refresh token
+    refresh_session = await RefreshModel.find_one(
+        RefreshModel.token_hash == security.hash_refresh_token(refresh_token)
+    )
+
+    if refresh_session is None:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+    if refresh_session.revoked:
+        await refresh_session.delete()
+        raise HTTPException(status_code=401, detail="Refresh token is revoked")
+    # Fix timezone mismatch and then compare
+    if refresh_session.expires_at.replace(tzinfo=UTC) < datetime.now(UTC):
+        await refresh_session.delete()
+        raise HTTPException(
+            status_code=401, detail="Refresh token expired, login again"
+        )
+
+    return refresh_session
+
+
+CurrentRefreshSession = Annotated[RefreshModel, Depends(get_refresh_session)]

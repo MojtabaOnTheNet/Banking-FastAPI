@@ -10,6 +10,7 @@ from banking_fastapi.db.schemas.auth_schema import (
     RegisterInputDTO,
 )
 from banking_fastapi.services.auth_service import AuthService
+from banking_fastapi.web.api.deps import CurrentRefreshSession
 
 logger = logging.getLogger(__name__)
 
@@ -47,5 +48,16 @@ async def login_user(
         )
         logger.info("Hello")
         return AccessTokenDTO(access_token=tokens.access_token)
+    except Exception as error:
+        raise HTTPException(401, str(error)) from error
+
+
+@router.post("/refresh", status_code=200)
+async def refresh(
+    token_session: CurrentRefreshSession, auth_service: AuthService = Depends()
+) -> AccessTokenDTO:
+    """Endpoint for getting a new access token using refresh token(session)."""
+    try:
+        return await auth_service.refresh(token_session)
     except Exception as error:
         raise HTTPException(401, str(error)) from error
