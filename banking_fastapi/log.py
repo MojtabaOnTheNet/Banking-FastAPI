@@ -59,4 +59,19 @@ def configure_logging() -> None:  # pragma: no cover
     logger.add(
         sys.stdout,
         level=settings.log_level.value,
+        serialize=not settings.debug,
+        backtrace=settings.debug,
+        diagnose=settings.debug,
+        colorize=True,
+        format=(
+            "{time:HH:mm:ss.SSS} | <lvl>{level:<8}</lvl> | <m><b>{message}</b></m>"
+        ),
+    )
+
+    logger.add(
+        "logs/app.log",
+        rotation="100 MB",
+        retention="30 days",
+        compression="zip",
+        level="INFO",
     )
