@@ -71,13 +71,19 @@ class UserDAO:
         """Get all users with limit/offset pagination."""
         return await UserModel.find_all(skip=offset, limit=limit).to_list()
 
-    async def get_by_id(self, user_id: PydanticObjectId) -> UserModel | None:
+    async def get_by_id(self, user_id: PydanticObjectId) -> UserModel:
         """Get single user."""
-        return await UserModel.get(user_id)
+        user = await UserModel.get(user_id)
+        if user is None:
+            raise ValueError("user not found")
+        return user
 
-    async def get_by_phone(self, input_phone: str) -> UserModel | None:
+    async def get_by_phone(self, input_phone: str) -> UserModel:
         """Get single user."""
-        return await UserModel.find_one(UserModel.phone == input_phone)
+        user = await UserModel.find_one(UserModel.phone == input_phone)
+        if user is None:
+            raise ValueError("user not found")
+        return user
 
     async def update_balance(self, user: UserModel, transaction_amount: float) -> None:
         """Update user balance."""

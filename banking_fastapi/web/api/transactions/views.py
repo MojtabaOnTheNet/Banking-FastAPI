@@ -9,34 +9,29 @@ from banking_fastapi.db.schemas.transaction_schema import (
 from banking_fastapi.services.transaction_service import (
     TransactionService,
 )
+from banking_fastapi.web.api.deps import CurrentUser
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[TransactionModelDTO])
 async def get_transactions(
-    limit: int = 10,
-    offset: int = 0,
+    current_user: CurrentUser,
     transaction_dao: TransactionDAO = Depends(),
 ) -> list[TransactionModel]:
-    """
-    Retrieve all transaction objects from the database.
-
-    :param limit: limit of transaction objects, defaults to 10.
-    :param offset: offset of transaction objects, defaults to 0.
-    :param transaction_dao: DAO for transaction models.
-    :return: list of transaction objects from database.
-    """
-    return await transaction_dao.get_all(limit=limit, offset=offset)
+    """Retrieve all transaction objects from the database for the logged user."""
+    return await transaction_dao.get_all_private(user_id=current_user.id)
 
 
 @router.post("/", status_code=201)
 async def create_transaction(
     transaction: TransactionModelInputDTO,
+    current_user: CurrentUser,
     transaction_service: TransactionService = Depends(),
 ) -> None:
     """Create a new transaction."""
     try:
-        await transaction_service.create_transaction(transaction)
+        transaction.user_id = current_user.id
+        await transaction_service.create_transaction(transaction=transaction)
     except Exception as error:
         raise HTTPException(404, str(error)) from error

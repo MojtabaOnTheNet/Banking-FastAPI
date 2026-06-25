@@ -50,7 +50,7 @@ class AuthService:
         if not verify_password(data.password, user.hashed_password):
             raise ValueError("Wrong password")
         access_token = create_access_token(
-            user_id=user.id, expires_delta=timedelta(minutes=5)
+            user_id=user.id, expires_delta=timedelta(minutes=15)
         )
         refresh_token = create_refresh_token()
         refresh_session = RefreshModel(
@@ -69,6 +69,6 @@ class AuthService:
     async def refresh(self, token_session: RefreshModel) -> AccessTokenDTO:
         """Create a new access token."""
         new_access_token = create_access_token(
-            user_id=token_session.user_id, expires_delta=timedelta(minutes=5)
+            user_id=token_session.user_id, expires_delta=timedelta(minutes=15)
         )
         return AccessTokenDTO(access_token=new_access_token)
