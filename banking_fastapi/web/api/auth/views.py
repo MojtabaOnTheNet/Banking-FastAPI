@@ -52,6 +52,20 @@ async def login_user(
         raise HTTPException(401, str(error)) from error
 
 
+@router.post("/logout", status_code=204)
+async def logout(
+    token_session: CurrentRefreshSession,
+    response: Response,
+    auth_service: AuthService = Depends(),
+) -> None:
+    """Endpoint for logging out user and revoking refresh token.
+
+    Note: the access token should be deleted on the frontend.
+    """
+    await auth_service.revoke(token_session)
+    response.delete_cookie("refresh_token")
+
+
 @router.post("/refresh", status_code=200)
 async def refresh(
     token_session: CurrentRefreshSession, auth_service: AuthService = Depends()

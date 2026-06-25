@@ -61,6 +61,11 @@ class AuthService:
         await refresh_session.insert()
         return TokenPairDTO(access_token=access_token, refresh_token=refresh_token)
 
+    async def revoke(self, token_session: RefreshModel) -> None:
+        """Receieve and revoke refresh token(session)."""
+        token_session.revoked = True
+        await token_session.save()
+
     async def refresh(self, token_session: RefreshModel) -> AccessTokenDTO:
         """Create a new access token."""
         new_access_token = create_access_token(
