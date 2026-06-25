@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     db_base: str
     db_echo: bool = False
 
+    # Variables for security
+    secret_key: str
+
     @property
     def db_url(self) -> URL:
         """

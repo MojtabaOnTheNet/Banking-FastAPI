@@ -59,8 +59,7 @@ class UserDAO:
 
     async def insert(self, user: UserModelInputDTO) -> None:
         """Add single user to session."""
-
-        await UserModel.insert_one(
+        await UserModel.insert(
             UserModel(
                 phone=user.phone,
                 full_name=user.full_name,
@@ -75,6 +74,10 @@ class UserDAO:
     async def get_by_id(self, user_id: PydanticObjectId) -> UserModel | None:
         """Get single user."""
         return await UserModel.get(user_id)
+
+    async def get_by_phone(self, input_phone: str) -> UserModel | None:
+        """Get single user."""
+        return await UserModel.find_one(UserModel.phone == input_phone)
 
     async def update_balance(self, user: UserModel, transaction_amount: float) -> None:
         """Update user balance."""

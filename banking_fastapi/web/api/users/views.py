@@ -4,12 +4,14 @@ from fastapi.param_functions import Depends
 from banking_fastapi.db.dao.user_dao import UserDAO
 from banking_fastapi.db.models.user_model import UserModel
 from banking_fastapi.db.schemas.user_schema import UserModelDTO, UserModelInputDTO
+from banking_fastapi.web.api.deps import CurrentUser
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[UserModelDTO])
 async def get_users(
+    current_user: CurrentUser,
     limit: int = 10,
     offset: int = 0,
     user_dao: UserDAO = Depends(),

@@ -26,7 +26,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${BANKING_FASTAPI_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${BANKING_FASTAPI_DB_PASS}
-    command: "mongod"
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
     volumes:
       - banking_fastapi-db-data:/data/db
     healthcheck:
