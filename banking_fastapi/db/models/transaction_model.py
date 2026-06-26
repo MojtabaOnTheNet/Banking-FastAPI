@@ -9,7 +9,6 @@ class TransactionType(enum.StrEnum):
 
     DEPOSIT = "Deposit"
     WITHDRAWAL = "Withdrawal"
-    TRANSFER = "Transfer"
     LOAN = "Loan"
 
 

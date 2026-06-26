@@ -6,9 +6,10 @@ from beanie import Document
 
 from banking_fastapi.db.models.auth_model import RefreshModel
 from banking_fastapi.db.models.transaction_model import TransactionModel
+from banking_fastapi.db.models.transfer_model import TransferModel
 from banking_fastapi.db.models.user_model import UserModel
 
 
 def load_all_models() -> Sequence[type[Document]]:
     """Load all models from this folder."""
-    return [UserModel, TransactionModel, RefreshModel]
+    return [UserModel, TransactionModel, TransferModel, RefreshModel]

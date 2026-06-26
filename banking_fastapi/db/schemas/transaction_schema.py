@@ -20,9 +20,14 @@ class TransactionModelDTO(BaseModel):
     created_at: datetime = datetime.now(UTC)
 
 
-class TransactionModelInputDTO(BaseModel):
+class TransactionModelRequestDTO(BaseModel):
+    """DTO for requesting a new transaction."""
+
+    transaction_type: TransactionType
+    amount: float
+
+
+class TransactionModelInputDTO(TransactionModelRequestDTO):
     """DTO for creating new transaction."""
 
     user_id: PydanticObjectId
-    transaction_type: TransactionType
-    amount: float

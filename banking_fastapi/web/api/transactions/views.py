@@ -5,6 +5,7 @@ from banking_fastapi.db.models.transaction_model import TransactionModel
 from banking_fastapi.db.schemas.transaction_schema import (
     TransactionModelDTO,
     TransactionModelInputDTO,
+    TransactionModelRequestDTO,
 )
 from banking_fastapi.services.transaction_service import (
     TransactionService,
@@ -25,13 +26,15 @@ async def get_transactions(
 
 @router.post("/", status_code=201)
 async def create_transaction(
-    transaction: TransactionModelInputDTO,
+    transaction: TransactionModelRequestDTO,
     current_user: CurrentUser,
     transaction_service: TransactionService = Depends(),
 ) -> None:
     """Create a new transaction."""
     try:
-        transaction.user_id = current_user.id
-        await transaction_service.create_transaction(transaction=transaction)
+        transaction_input = TransactionModelInputDTO(
+            **transaction.model_dump(), user_id=current_user.id
+        )
+        await transaction_service.create_transaction(transaction=transaction_input)
     except Exception as error:
         raise HTTPException(404, str(error)) from error
