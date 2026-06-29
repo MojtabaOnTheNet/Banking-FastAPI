@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
 from banking_fastapi.db.schemas.auth_schema import (
@@ -9,6 +9,7 @@ from banking_fastapi.db.schemas.auth_schema import (
     LoginInputDTO,
     RegisterInputDTO,
 )
+from banking_fastapi.limiter import limiter
 from banking_fastapi.services.auth_service import AuthService
 from banking_fastapi.web.api.deps import CurrentRefreshSession
 
@@ -18,8 +19,11 @@ router = APIRouter()
 
 
 @router.post("/register", status_code=201)
+@limiter.limit("10/hour")
 async def register_user(
-    register_input: RegisterInputDTO, auth_service: AuthService = Depends()
+    register_input: RegisterInputDTO,
+    request: Request,
+    auth_service: AuthService = Depends(),
 ) -> None:
     """Endpoint for registering a new user."""
     try:
@@ -29,9 +33,11 @@ async def register_user(
 
 
 @router.post("/login", status_code=200)
+@limiter.limit("5/hour")
 async def login_user(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
+    request: Request,
     auth_service: AuthService = Depends(),
 ) -> AccessTokenDTO:
     """Endpoint for user login and receieving access token."""
@@ -53,8 +59,10 @@ async def login_user(
 
 
 @router.post("/logout", status_code=204)
+@limiter.limit("100/minute")
 async def logout(
     token_session: CurrentRefreshSession,
+    request: Request,
     response: Response,
     auth_service: AuthService = Depends(),
 ) -> None:
@@ -67,8 +75,11 @@ async def logout(
 
 
 @router.post("/refresh", status_code=200)
+@limiter.limit("5/minute")
 async def refresh(
-    token_session: CurrentRefreshSession, auth_service: AuthService = Depends()
+    request: Request,
+    token_session: CurrentRefreshSession,
+    auth_service: AuthService = Depends(),
 ) -> AccessTokenDTO:
     """Endpoint for getting a new access token using refresh token(session)."""
     try:

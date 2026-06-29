@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from banking_fastapi.db.dao.transaction_dao import TransactionDAO
 from banking_fastapi.db.models.transaction_model import TransactionModel
@@ -7,6 +7,7 @@ from banking_fastapi.db.schemas.transaction_schema import (
     TransactionModelInputDTO,
     TransactionModelRequestDTO,
 )
+from banking_fastapi.limiter import limiter
 from banking_fastapi.services.transaction_service import (
     TransactionService,
 )
@@ -16,7 +17,9 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[TransactionModelDTO])
+@limiter.limit("100/minute")
 async def get_transactions(
+    request: Request,
     current_user: CurrentUser,
     transaction_dao: TransactionDAO = Depends(),
 ) -> list[TransactionModel]:
@@ -25,7 +28,9 @@ async def get_transactions(
 
 
 @router.post("/", status_code=201)
+@limiter.limit("100/minute")
 async def create_transaction(
+    request: Request,
     transaction: TransactionModelRequestDTO,
     current_user: CurrentUser,
     transaction_service: TransactionService = Depends(),

@@ -34,7 +34,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 40
+  redis:
+    image: redis:8
+    ports:
+      - "6379:6379"
+    volumes:
+      - banking_fastapi-redis-data:/data
+    environment:
+      - REDIS_ARGS=--requirepass ${BANKING_FASTAPI_REDIS_PASS} --appendonly yes
+    restart: always
 
 volumes:
   banking_fastapi-db-data:
     name: banking_fastapi-db-data
+  banking_fastapi-redis-data:
+    name: banking_fastapi-redis-data
