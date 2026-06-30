@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     # Variables for security
     secret_key: str
 
+    # Variables for smtp
+    smtp_key: str
+    smtp_host: str
+    smtp_reciever: str
+
     @property
     def db_url(self) -> URL:
         """

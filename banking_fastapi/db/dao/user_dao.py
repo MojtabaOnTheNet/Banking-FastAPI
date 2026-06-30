@@ -13,6 +13,7 @@ class UserDAO:
         await UserModel.insert(
             UserModel(
                 phone=user.phone,
+                email=user.email,
                 full_name=user.full_name,
                 hashed_password=password_hash.hash(user.password),
             )
@@ -39,3 +40,7 @@ class UserDAO:
     async def update_balance(self, user: UserModel, transaction_amount: float) -> None:
         """Update user balance."""
         await user.update({"$inc": {"balance": transaction_amount}})
+
+    async def update_password(self, user: UserModel, password: str) -> None:
+        """Update user password."""
+        await user.update({"$set": {"hashed_password": password_hash.hash(password)}})

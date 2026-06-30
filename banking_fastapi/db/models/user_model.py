@@ -3,13 +3,15 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from beanie import Document, Indexed
-from pydantic import field_validator
+from pydantic import EmailStr, field_validator
+from pymongo import IndexModel
 
 
 class UserModel(Document):
     """Model for a user."""
 
     phone: Annotated[str, Indexed(unique=True)]
+    email: EmailStr | None = None
     full_name: str
     hashed_password: str
     balance: float = 1000.0
@@ -30,3 +32,10 @@ class UserModel(Document):
 
     class Settings:
         name = "users"
+        IndexModel(
+            [("email", 1)],
+            unique=True,
+            partialFilterExpression={
+                "email": {"$type": "string"},
+            },
+        )

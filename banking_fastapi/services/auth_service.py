@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class AuthService:
-    """Auth for authentication functionality."""
+    """Service for authentication functionality."""
 
     def __init__(self) -> None:
         self.user_dao = UserDAO()
@@ -33,6 +33,7 @@ class AuthService:
             raise ValueError("Phone number already registered")
         user = UserModelInputDTO(
             phone=data.phone,
+            email=data.email,
             full_name=data.full_name,
             password=data.password,
         )

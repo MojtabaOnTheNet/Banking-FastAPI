@@ -46,3 +46,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """Turn a normal password into a hashed_password."""
     return password_hash.hash(password)
+
+
+def create_password_reset_code() -> str:
+    """Generates a 5 digit verification code."""
+    return f"{secrets.randbelow(90000) + 10000}"

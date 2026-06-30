@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class RegisterInputDTO(BaseModel):
     """DTO for registering a new user."""
 
     phone: str
+    email: EmailStr
     password: str
     full_name: str
 
